@@ -47,7 +47,6 @@ test:
     - python test/runtest.py  # [py<313]
   requires:
     - pip
-    - bottle
 
 about:
   home: https://github.com/pympler/pympler
