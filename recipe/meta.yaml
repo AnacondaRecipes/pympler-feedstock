@@ -12,8 +12,7 @@ source:
 build:
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
-  # https://github.com/pympler/pympler/blob/master/README.md?plain=1#L38-L39
-  skip: True  # [py<36 or py>312]
+  skip: True  # [py<36]
 
 requirements:
   host:
@@ -44,9 +43,11 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - python test/runtest.py
+    # https://github.com/pympler/pympler/issues/163
+    - python test/runtest.py  # [py<313]
   requires:
     - pip
+    - bottle
 
 about:
   home: https://github.com/pympler/pympler
