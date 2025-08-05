@@ -1,47 +1,71 @@
 {% set name = "pympler" %}
-{% set version = "0.9" %}
-{% set sha256 = "6a10c1658805726d9e7a2d08e6ffc956e7082dfbce8abcd33b111dd382f87a5b" %}
+{% set version = "1.1" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://github.com/{{ name }}/{{ name }}/archive/{{ version }}.tar.gz
-#  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 1eaa867cb8992c218430f1708fdaccda53df064144d1c5656b1e6f1ee6000424
 
 build:
-  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
-  script: python -m pip install --no-deps --ignore-installed .
+  skip: True  # [py<36]
 
 requirements:
   host:
     - pip
     - python
+    - wheel
     - setuptools
   run:
     - python
+    - pywin32 >=226  # [win]
 
 test:
   source_files:
-    - test/*
+    - test
+  imports:
+    - pympler
+    - pympler.asizeof
+    - pympler.classtracker
+    - pympler.classtracker_stats
+    - pympler.garbagegraph
+    - pympler.muppy
+    - pympler.process
+    - pympler.refgraph
+    - pympler.util
+    - pympler.util.compat
+    - pympler.util.stringutils
+    - pympler.web
   commands:
-    - python test/runtest.py
+    - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    # https://github.com/pympler/pympler/issues/163
+    - python test/runtest.py  # [py<313]
+  requires:
+    - pip
+    - bottle
 
 about:
   home: https://github.com/pympler/pympler
-  license: Apache-2
+  license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
-  summary: 'Development tool to measure, monitor and analyze the memory
-  behavior of Python objects in a running Python application. '
+  summary: |
+    Pympler is a development tool to measure, monitor and analyze the memory behavior of Python objects in a running Python application.
   description: |
-    A development tool to measure, monitor and analyze the memory
-    behavior of Python objects.
-  doc_url: http://pythonhosted.org/Pympler/
+    Pympler is a development tool to measure, monitor and analyze the memory behavior of Python objects in a running Python application.
+    By pympling a Python application, detailed insight in the size and the lifetime of Python objects can be obtained. Undesirable or
+    unexpected runtime behavior like memory bloat and other "pymples" can easily be identified.
+    Pympler integrates three previously separate projects into a single, comprehensive profiling tool.
+    Asizeof provides basic size information for one or several Python objects, muppy is used for on-line monitoring of a Python
+    application and the class tracker provides off-line analysis of the lifetime of selected Python objects.
+    A web profiling frontend exposes process statistics, garbage visualisation and class tracker statistics.
+    Pympler is written entirely in Python, with no dependencies to external libraries on Linux and MacOS. On Windows, pywin32 is required.
+  doc_url: https://pythonhosted.org/Pympler
   dev_url: https://github.com/pympler/pympler
 
 extra:
