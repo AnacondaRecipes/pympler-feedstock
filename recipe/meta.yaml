@@ -23,6 +23,7 @@ requirements:
     - setuptools
   run:
     - python
+    - pywin32 >=226  # [win]
 
 test:
   source_files:
